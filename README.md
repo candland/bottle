@@ -1,6 +1,6 @@
 # Bottle
 
-TODO: Write a gem description
+Mostly an experiment with IoC in Ruby.
 
 ## Installation
 
