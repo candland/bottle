@@ -1,4 +1,5 @@
 require 'singleton'
+require_relative 'registration'
 
 module Bottle
 	class Ioc
@@ -15,20 +16,16 @@ module Bottle
 
 		def register name, &block
 			if services[name]
-				services[name][:block] = block
+				services[name].block = block
 			else
-				services[name.to_sym] = {
-					block: block,
-					injected_to: []
-				}
+				services[name.to_sym] = Registration.new(name, block)
 			end
 			self
 		end
 
 		def resolve name
-			if services[name.to_sym] and services[name.to_sym][:block]
-				puts "RESOLVED #{name} to #{services[name.to_sym][:block]}"
-				return services[name.to_sym][:block].call
+			if services[name.to_sym] and services[name.to_sym].block
+				return services[name.to_sym].block.call
 			else
 				raise ServiceNotFoundError.new("Service #{name} not found.")
 			end
@@ -37,9 +34,9 @@ module Bottle
 		def inject_to klass, as, options = {}
 			name = as.to_sym
 			iname = "@#{name}".to_sym
-			service = (services[name] ||= {block: nil, injected_to: []})
+			service = (services[name] ||= Registration.new(name))
 
-			if not already_injected service, klass
+			if not service.injected_to?(klass)
 				assert_no_name_conflict klass, name
 
 				klass.class_eval do
@@ -52,15 +49,11 @@ module Bottle
 					end
 				end
 
-				service[:injected_to] << klass
+				service.injected_to(klass)
 			end
 		end
 
 		private
-
-		def already_injected service, klass
-			service[:injected_to].include?(klass)
-		end
 
 		def assert_no_name_conflict klass, name
 			if klass.instance_methods.include?(name)
