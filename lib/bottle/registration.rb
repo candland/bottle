@@ -29,6 +29,5 @@ module Bottle
 			@injected_to ||= []
 		end
 
-
 	end
 end
