@@ -14,7 +14,7 @@ describe Bottle, "injection exceptions" do
 		it "must throw when not found on use" do
 			-> {
 				y.inject_errors
-			}.must_raise Bottle::ServiceNotFoundError
+			}.must_raise Bottle::RegistrationNotFoundError
 		end
 	end
 

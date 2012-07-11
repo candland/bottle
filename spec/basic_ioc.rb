@@ -6,10 +6,12 @@ describe Bottle, "basic IOC" do
 		c.register :basic_ioc do
 			"my service x"
 		end
+		c.register(:logger) {Logger.new STDOUT}
 	end
 
 	class B
 		inject :basic_ioc
+		inject :logger
 	end
 
 	let (:b) {
@@ -25,4 +27,30 @@ describe Bottle, "basic IOC" do
 			b.basic_ioc.must_equal "my service x"
 		end
 	end
+
+	describe "inject new class into accessor" do
+	end
+
+	describe "register_directory" do
+		it "must look for classes in a directory" do
+		end
+
+		it "must use class in environment module" do
+			# /                    <- production components
+			# 	/test              <- test components or anything matching environment.
+			# 		-component_x
+			# 	-compenent_x
+			#
+			# Given test environment use Test::ComponentX assume production.
+		end
+	end
+
+	describe "register_module" do
+		it "must register classes under the given module" do
+		end
+
+		it "must handle namespacing by using the first registered class found" do
+		end
+	end
+
 end
